@@ -1,18 +1,26 @@
 package main
 
-import "sync/atomic"
+import (
+	"sync"
+	"sync/atomic"
+)
 
 var x atomic.Int64
 var y int64
-var ch = make(chan struct{}) // 待ち合わせ
 
 func main() {
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		print(x.Load())
 		print(y)
-		println(x.Load())
-		ch <- struct{}{}
+		wg.Done()
 	}()
-	x.Store(1)
-	y = 1
-	<-ch
+	wg.Add(1)
+	go func() {
+		x.Store(1)
+		y = 1
+		wg.Done()
+	}()
+	wg.Wait()
 }
