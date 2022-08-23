@@ -24,7 +24,8 @@ func main() {
 	wg.Add(1)
 	go func() {
 		atomic.StoreInt64(&y, 1)
-		r2 := x
+		x = 2 // non-atomic
+		r2 := atomic.LoadInt64(&x)
 		fmt.Println("r2 =", r2)
 		wg.Done()
 	}()
